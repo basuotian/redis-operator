@@ -68,7 +68,9 @@ func (s *ServiceService) CreateIfNotExistsService(namespace string, service *cor
 func (s *ServiceService) UpdateService(namespace string, service *corev1.Service) error {
 	_, err := s.kubeClient.CoreV1().Services(namespace).Update(context.TODO(), service, metav1.UpdateOptions{})
 	if err != nil {
-		return err
+		// skip error because k8s 1.19 does not support service replace operation
+		s.logger.WithField("namespace", namespace).WithField("serviceName", service.Name).Infof("skip service update error")
+		// return err
 	}
 	s.logger.WithField("namespace", namespace).WithField("serviceName", service.Name).Infof("service updated")
 	return nil
